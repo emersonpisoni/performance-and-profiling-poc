@@ -37,7 +37,7 @@ export function generateTasks(count = 10_000): Task[] {
       status: statuses[Math.floor(r(3) * statuses.length)],
       category: categories[Math.floor(r(4) * categories.length)],
       assignee: assignees[Math.floor(r(5) * assignees.length)],
-      createdAt: new Date(2024, Math.floor(r(6) * 12), Math.floor(r(7) * 28) + 1).toLocaleDateString('pt-BR'),
+      createdAt: new Date(2024, Math.floor(r(6) * 12), Math.floor(r(7) * 28) + 1).toLocaleDateString('en-US'),
     })
   }
   return tasks
