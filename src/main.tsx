@@ -2,8 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 
-// Para ativar o why-did-you-render na versão "Before",
-// descomente o import abaixo (deve vir ANTES do import do React/App):
+// To enable why-did-you-render in the "Before" version,
+// uncomment the import below (must come BEFORE any React/App import):
 // import './wdyr'
 
 createRoot(document.getElementById('root')!).render(
