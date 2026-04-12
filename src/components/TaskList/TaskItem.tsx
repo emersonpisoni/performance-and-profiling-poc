@@ -2,15 +2,15 @@ import type { Task } from '../../data/tasks'
 import styles from './TaskList.module.css'
 
 const priorityLabel: Record<Task['priority'], string> = {
-  low: 'Baixa',
-  medium: 'Média',
-  high: 'Alta',
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
 }
 
 const statusLabel: Record<Task['status'], string> = {
-  'todo': 'A fazer',
-  'in-progress': 'Em progresso',
-  'done': 'Concluído',
+  'todo': 'To do',
+  'in-progress': 'In progress',
+  'done': 'Done',
 }
 
 interface Props {
@@ -38,6 +38,6 @@ export function TaskItem({ task }: Props) {
   )
 }
 
-// Versão memoizada — usada na página "After"
+// Memoized version — used in the "After" page
 import { memo } from 'react'
 export const TaskItemMemo = memo(TaskItem)
