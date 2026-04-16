@@ -1,5 +1,5 @@
-// SOLUÇÃO: react-window renderiza apenas os itens visíveis na tela.
-// Independentemente de quantos itens existam, só ~10-15 nós DOM são criados.
+// SOLUTION: react-window renders only the visible items on screen.
+// Regardless of how many items exist, only ~10-15 DOM nodes are created.
 import { FixedSizeList, type ListChildComponentProps } from 'react-window'
 import type { Task } from '../../data/tasks'
 import { TaskItemMemo } from './TaskItem'
@@ -22,15 +22,15 @@ function Row({ index, style, data }: ListChildComponentProps<Task[]>) {
 
 export function TaskListOptimized({ tasks }: Props) {
   if (tasks.length === 0) {
-    return <div className={styles.empty}>Nenhuma tarefa encontrada.</div>
+    return <div className={styles.empty}>No tasks found.</div>
   }
 
   return (
     <div className={styles.list}>
       <div className={styles.listHeader}>
-        {tasks.length.toLocaleString()} tarefa(s) — com virtualização (react-window)
+        {tasks.length.toLocaleString()} task(s) — with virtualization (react-window)
       </div>
-      {/* SOLUÇÃO: FixedSizeList só monta os itens visíveis na viewport */}
+      {/* SOLUTION: FixedSizeList only mounts visible items in the viewport */}
       <FixedSizeList
         height={500}
         width="100%"
