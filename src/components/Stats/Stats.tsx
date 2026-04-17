@@ -3,17 +3,17 @@ import styles from './Stats.module.css'
 
 type Stats = ReturnType<typeof useTasks>['stats']
 
-// Simula um cálculo "pesado" para demonstrar o problema de useMemo
-// PROBLEMA: sem useMemo, isso roda a cada render do componente pai
+// Simulates a "heavy" calculation to demonstrate the useMemo problem.
+// PROBLEM: without useMemo, this runs on every render of the parent component.
 export function expensiveStatsCalc(stats: Stats): {
   completionRate: number
   highPriorityRate: number
   inProgressRate: number
 } {
-  // Simulação de processamento lento (ex: agregações em datasets grandes)
+  // Simulates slow processing (e.g. aggregations on large datasets)
   const start = performance.now()
   while (performance.now() - start < 8) {
-    // bloqueia a thread por ~8ms para tornar o custo visível no profiler
+    // blocks the thread for ~8ms to make the cost visible in the Profiler
   }
   return {
     completionRate: stats.filtered > 0 ? Math.round((stats.done / stats.filtered) * 100) : 0,
@@ -31,23 +31,23 @@ export function Stats({ stats, computed }: Props) {
   return (
     <div className={styles.grid}>
       <div className={styles.card}>
-        <span className={styles.label}>Total filtrado</span>
+        <span className={styles.label}>Filtered total</span>
         <span className={styles.value}>{stats.filtered.toLocaleString()}</span>
       </div>
       <div className={styles.card}>
-        <span className={styles.label}>Concluídas</span>
+        <span className={styles.label}>Done</span>
         <span className={`${styles.value} ${styles.done}`}>
           {stats.done.toLocaleString()} ({computed.completionRate}%)
         </span>
       </div>
       <div className={styles.card}>
-        <span className={styles.label}>Em progresso</span>
+        <span className={styles.label}>In progress</span>
         <span className={`${styles.value} ${styles.progress}`}>
           {stats.inProgress.toLocaleString()} ({computed.inProgressRate}%)
         </span>
       </div>
       <div className={styles.card}>
-        <span className={styles.label}>Alta prioridade</span>
+        <span className={styles.label}>High priority</span>
         <span className={`${styles.value} ${styles.high}`}>
           {stats.highPriority.toLocaleString()} ({computed.highPriorityRate}%)
         </span>

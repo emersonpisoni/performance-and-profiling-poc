@@ -14,7 +14,7 @@ export function SearchBar({ filters, onSearch, onPriority, onStatus }: Props) {
       <input
         className={styles.input}
         type="text"
-        placeholder="Buscar tarefas..."
+        placeholder="Search tasks..."
         value={filters.search}
         onChange={(e) => onSearch(e.target.value)}
       />
@@ -23,20 +23,20 @@ export function SearchBar({ filters, onSearch, onPriority, onStatus }: Props) {
         value={filters.priority}
         onChange={(e) => onPriority(e.target.value as Filters['priority'])}
       >
-        <option value="all">Todas prioridades</option>
-        <option value="high">Alta</option>
-        <option value="medium">Média</option>
-        <option value="low">Baixa</option>
+        <option value="all">All priorities</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
       </select>
       <select
         className={styles.select}
         value={filters.status}
         onChange={(e) => onStatus(e.target.value as Filters['status'])}
       >
-        <option value="all">Todos status</option>
-        <option value="todo">A fazer</option>
-        <option value="in-progress">Em progresso</option>
-        <option value="done">Concluído</option>
+        <option value="all">All statuses</option>
+        <option value="todo">To do</option>
+        <option value="in-progress">In progress</option>
+        <option value="done">Done</option>
       </select>
     </div>
   )
