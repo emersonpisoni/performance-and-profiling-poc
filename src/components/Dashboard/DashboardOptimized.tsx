@@ -1,25 +1,25 @@
 // =============================================================
-// VERSÃO "AFTER" — Dashboard com otimizações aplicadas
+// "AFTER" VERSION — Dashboard with optimizations applied
 // =============================================================
 //
-// SOLUÇÕES aplicadas:
+// SOLUTIONS applied:
 //
-// 1. useMemo para cálculo pesado
-//    expensiveStatsCalc só roda quando `stats` mudar de referência.
-//    No Profiler: tempo do Stats cai para perto de 0ms em renders subsequentes.
+// 1. useMemo for heavy calculation
+//    expensiveStatsCalc only runs when `stats` changes reference.
+//    In the Profiler: Stats time drops to near 0ms on subsequent renders.
 //
-// 2. useCallback para funções passadas como props
-//    As referências são estáveis entre renders, permitindo que React.memo
-//    nos filhos evite re-renders desnecessários.
+// 2. useCallback for functions passed as props
+//    References are stable between renders, allowing React.memo
+//    on children to skip unnecessary re-renders.
 //
-// 3. Virtualização com react-window
-//    TaskListOptimized renderiza apenas ~10 itens na viewport,
-//    independentemente de quantas tarefas existem no array.
+// 3. Virtualization with react-window
+//    TaskListOptimized renders only ~10 items in the viewport,
+//    regardless of how many tasks exist in the array.
 //
-// Como observar:
-//   - Abra o React DevTools → aba Profiler → Record
-//   - Digite algo no campo de busca
-//   - Compare o flamegraph com o da versão "Before"
+// How to observe:
+//   - Open React DevTools → Profiler tab → Record
+//   - Type something in the search field
+//   - Compare the flamegraph with the "Before" version
 
 import { useCallback, useMemo } from 'react'
 import { useTasks } from '../../hooks/useTasks'
@@ -32,23 +32,23 @@ import styles from './Dashboard.module.css'
 export function DashboardOptimized() {
   const { tasks, filters, stats, setSearch, setPriority, setStatus } = useTasks()
 
-  // SOLUÇÃO 1: useMemo — cálculo pesado só roda quando stats muda
+  // SOLUTION 1: useMemo — heavy calculation only runs when stats changes
   const computed = useMemo(() => expensiveStatsCalc(stats), [stats])
 
-  // SOLUÇÃO 2: useCallback — referências estáveis evitam re-renders nos filhos
+  // SOLUTION 2: useCallback — stable references prevent re-renders on children
   const handleSearch = useCallback((value: string) => setSearch(value), [setSearch])
   const handlePriority = useCallback((value: Filters['priority']) => setPriority(value), [setPriority])
   const handleStatus = useCallback((value: Filters['status']) => setStatus(value), [setStatus])
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Dashboard (After — otimizado)</h2>
+      <h2 className={styles.title}>Dashboard (After — optimized)</h2>
       <p className={styles.hint}>
-        Abra o React DevTools Profiler e grave enquanto digita na busca.
-        Observe que Stats não re-renderiza mais, e a lista usa virtualização.
+        Open the React DevTools Profiler and record while typing in the search field.
+        Notice that Stats no longer re-renders, and the list uses virtualization.
       </p>
 
-      {/* Referências estáveis via useCallback */}
+      {/* Stable references via useCallback */}
       <SearchBar
         filters={filters}
         onSearch={handleSearch}
@@ -56,10 +56,10 @@ export function DashboardOptimized() {
         onStatus={handleStatus}
       />
 
-      {/* SOLUÇÃO 1: cálculo memoizado */}
+      {/* SOLUTION 1: memoized calculation */}
       <Stats stats={stats} computed={computed} />
 
-      {/* SOLUÇÃO 3: lista virtualizada — só ~10 nós DOM na tela */}
+      {/* SOLUTION 3: virtualized list — only ~10 DOM nodes on screen */}
       <TaskListOptimized tasks={tasks} />
     </div>
   )

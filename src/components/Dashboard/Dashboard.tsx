@@ -1,26 +1,26 @@
 // =============================================================
-// VERSÃO "BEFORE" — Dashboard com problemas de performance
+// "BEFORE" VERSION — Dashboard with performance problems
 // =============================================================
 //
-// PROBLEMAS INTENCIONAIS neste componente:
+// INTENTIONAL PROBLEMS in this component:
 //
-// 1. CÁLCULO PESADO sem useMemo
-//    expensiveStatsCalc() é chamado a cada render, mesmo quando
-//    as stats não mudaram. Visível no Profiler como tempo alto no Stats.
+// 1. HEAVY CALCULATION without useMemo
+//    expensiveStatsCalc() is called on every render, even when
+//    stats haven't changed. Visible in the Profiler as high time on Stats.
 //
-// 2. FUNÇÃO RECRIADA a cada render sem useCallback
-//    onSearch, onPriority, onStatus são novas referências a cada render.
-//    Isso impede que React.memo funcione nos filhos.
+// 2. FUNCTION RECREATED on every render without useCallback
+//    onSearch, onPriority, onStatus are new references on every render.
+//    This prevents React.memo from working on child components.
 //
-// 3. TODOS OS FILHOS re-renderizam quando o pai re-renderiza
-//    Mesmo que as props de Stats não mudaram, ele re-renderiza porque
-//    as funções passadas ao SearchBar são novas a cada render.
+// 3. ALL CHILDREN re-render when the parent re-renders
+//    Even though Stats props didn't change, it re-renders because
+//    the functions passed to SearchBar are new on every render.
 //
-// Como observar:
-//   - Abra o React DevTools → aba Profiler → Record
-//   - Digite algo no campo de busca
-//   - Pare a gravação e veja o flamegraph: Stats re-renderiza mesmo sem mudança
-//   - Ative "Highlight updates" nas configurações do DevTools
+// How to observe:
+//   - Open React DevTools → Profiler tab → Record
+//   - Type something in the search field
+//   - Stop recording and check the flamegraph: Stats re-renders even without change
+//   - Enable "Highlight updates" in DevTools settings
 
 import { useTasks } from '../../hooks/useTasks'
 import { SearchBar } from '../SearchBar/SearchBar'
@@ -31,21 +31,21 @@ import styles from './Dashboard.module.css'
 export function Dashboard() {
   const { tasks, filters, stats, setSearch, setPriority, setStatus } = useTasks()
 
-  // PROBLEMA 1: cálculo pesado sem memoização — roda a cada render
+  // PROBLEM 1: heavy calculation without memoization — runs on every render
   const computed = expensiveStatsCalc(stats)
 
-  // PROBLEMA 2: funções novas a cada render (sem useCallback)
-  // onSearch, onPriority, onStatus são recriadas mesmo que o estado não mude
+  // PROBLEM 2: new functions on every render (no useCallback)
+  // onSearch, onPriority, onStatus are recreated even when state hasn't changed
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Dashboard (Before — com problemas)</h2>
+      <h2 className={styles.title}>Dashboard (Before — with problems)</h2>
       <p className={styles.hint}>
-        Abra o React DevTools Profiler e grave enquanto digita na busca.
-        Observe Stats re-renderizando desnecessariamente por causa do cálculo pesado.
+        Open the React DevTools Profiler and record while typing in the search field.
+        Notice Stats re-rendering unnecessarily due to the expensive calculation.
       </p>
 
-      {/* PROBLEMA 2: novas referências de função a cada render */}
+      {/* PROBLEM 2: new function references on every render */}
       <SearchBar
         filters={filters}
         onSearch={setSearch}
@@ -53,10 +53,10 @@ export function Dashboard() {
         onStatus={setStatus}
       />
 
-      {/* PROBLEMA 1: Stats recalcula tudo a cada render */}
+      {/* PROBLEM 1: Stats recalculates everything on every render */}
       <Stats stats={stats} computed={computed} />
 
-      {/* PROBLEMA 3: TaskList renderiza todos os itens no DOM */}
+      {/* PROBLEM 3: TaskList renders all items in the DOM */}
       <TaskList tasks={tasks} />
     </div>
   )
