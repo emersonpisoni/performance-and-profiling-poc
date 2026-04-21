@@ -3,18 +3,13 @@ import styles from './Stats.module.css'
 
 type Stats = ReturnType<typeof useTasks>['stats']
 
-// Simulates a "heavy" calculation to demonstrate the useMemo problem.
-// PROBLEM: without useMemo, this runs on every render of the parent component.
 export function expensiveStatsCalc(stats: Stats): {
   completionRate: number
   highPriorityRate: number
   inProgressRate: number
 } {
-  // Simulates slow processing (e.g. aggregations on large datasets)
   const start = performance.now()
-  while (performance.now() - start < 8) {
-    // blocks the thread for ~8ms to make the cost visible in the Profiler
-  }
+  while (performance.now() - start < 8) {}
   return {
     completionRate: stats.filtered > 0 ? Math.round((stats.done / stats.filtered) * 100) : 0,
     highPriorityRate: stats.filtered > 0 ? Math.round((stats.highPriority / stats.filtered) * 100) : 0,

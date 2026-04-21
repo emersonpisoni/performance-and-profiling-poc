@@ -14,8 +14,6 @@ export function useTasks() {
     status: 'all',
   })
 
-  // NOTE: No memoization here — used intentionally in the "Before" version.
-  // The "After" version wraps this in useMemo inside the component.
   const filtered = ALL_TASKS.filter((task) => {
     const matchSearch =
       filters.search === '' ||

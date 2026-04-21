@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { Task } from '../../data/tasks'
 import styles from './TaskList.module.css'
 
@@ -38,6 +39,4 @@ export function TaskItem({ task }: Props) {
   )
 }
 
-// Memoized version — used in the "After" page
-import { memo } from 'react'
 export const TaskItemMemo = memo(TaskItem)

@@ -1,5 +1,3 @@
-// PROBLEM: Renders ALL items in the DOM at once.
-// With 10,000 tasks, this creates 10,000 DOM nodes, freezing scroll and the browser.
 import type { Task } from '../../data/tasks'
 import { TaskItem } from './TaskItem'
 import styles from './TaskList.module.css'
@@ -19,7 +17,6 @@ export function TaskList({ tasks }: Props) {
         {tasks.length.toLocaleString()} task(s) — no virtualization
       </div>
       <div className={styles.scroll}>
-        {/* PROBLEM: all {tasks.length} items are rendered at once */}
         {tasks.map((task) => (
           <TaskItem key={task.id} task={task} />
         ))}

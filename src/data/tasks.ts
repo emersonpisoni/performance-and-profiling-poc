@@ -24,7 +24,6 @@ function seededRandom(seed: number): number {
   return x - Math.floor(x)
 }
 
-// Deterministic generation so data is stable across renders
 export function generateTasks(count = 10_000): Task[] {
   const tasks: Task[] = []
   for (let i = 0; i < count; i++) {
@@ -43,5 +42,4 @@ export function generateTasks(count = 10_000): Task[] {
   return tasks
 }
 
-// Singleton — generated once, reused everywhere
 export const ALL_TASKS = generateTasks()

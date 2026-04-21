@@ -1,5 +1,3 @@
-// SOLUTION: react-window renders only the visible items on screen.
-// Regardless of how many items exist, only ~10-15 DOM nodes are created.
 import { FixedSizeList, type ListChildComponentProps } from 'react-window'
 import type { Task } from '../../data/tasks'
 import { TaskItemMemo } from './TaskItem'
@@ -30,7 +28,6 @@ export function TaskListOptimized({ tasks }: Props) {
       <div className={styles.listHeader}>
         {tasks.length.toLocaleString()} task(s) — with virtualization (react-window)
       </div>
-      {/* SOLUTION: FixedSizeList only mounts visible items in the viewport */}
       <FixedSizeList
         height={500}
         width="100%"
