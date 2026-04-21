@@ -1,124 +1,124 @@
 # React Performance & Profiling POC
 
-Projeto de estudo sobre performance e profiling no React. Demonstra problemas comuns, como identificá-los com ferramentas e como resolvê-los.
+A study project on React performance and profiling. Demonstrates common performance problems, how to identify them with tooling, and how to fix them.
 
-## Como rodar
+## Getting started
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abra `http://localhost:5173` e alterne entre **Before** e **After** no menu superior.
+Open `http://localhost:5173` and toggle between **Before** and **After** in the top navigation.
 
 ---
 
-## Ferramentas de Profiling
+## Profiling Tools
 
 ### React DevTools Profiler
 
-A principal ferramenta para medir performance em React.
+The main tool for measuring React performance.
 
-1. Instale a extensão **React Developer Tools** no Chrome/Firefox
-2. Abra o DevTools → aba **Profiler**
-3. Clique em **Record** (círculo vermelho)
-4. Interaja com a página (ex: digite na busca)
-5. Clique em **Stop**
-6. Analise o flamegraph: cada barra é um componente, a largura indica o tempo de render
+1. Install the **React Developer Tools** extension for Chrome/Firefox
+2. Open DevTools → **Profiler** tab
+3. Click **Record** (red circle)
+4. Interact with the page (e.g. type in the search field)
+5. Click **Stop**
+6. Analyze the flamegraph: each bar is a component, width indicates render time
 
-**Configurações úteis:**
-- "Highlight updates when components render" → pisca os componentes que re-renderizaram
-- "Record why each component rendered" → mostra o motivo do re-render
+**Useful settings:**
+- "Highlight updates when components render" → flashes components that re-rendered
+- "Record why each component rendered" → shows the reason for each re-render
 
 ### `why-did-you-render`
 
-Biblioteca que loga no console quando um componente re-renderiza com as mesmas props.
+Library that logs to the console when a component re-renders with the same props.
 
-Para ativar, descomente a linha em `src/main.tsx`:
+To enable, uncomment the line in `src/main.tsx`:
 
 ```ts
 import './wdyr'
 ```
 
-Abra o console do browser e interaja com a página — você verá logs como:
+Open the browser console and interact with the page — you will see logs like:
 ```
 TaskItem re-rendered with the same props
 ```
 
 ### Web Vitals
 
-Métricas padronizadas de UX (Core Web Vitals):
+Standardized UX metrics (Core Web Vitals):
 
-| Métrica | O que mede | Meta |
+| Metric | What it measures | Target |
 |---|---|---|
-| **LCP** | Largest Contentful Paint — tempo até o maior elemento carregar | < 2.5s |
-| **CLS** | Cumulative Layout Shift — estabilidade visual da página | < 0.1 |
-| **INP** | Interaction to Next Paint — responsividade a cliques/teclas | < 200ms |
+| **LCP** | Largest Contentful Paint — time until the largest element loads | < 2.5s |
+| **CLS** | Cumulative Layout Shift — visual stability of the page | < 0.1 |
+| **INP** | Interaction to Next Paint — responsiveness to clicks/keystrokes | < 200ms |
 
-Para medir, use a lib `web-vitals` ou a extensão **Web Vitals** do Chrome.
+To measure, use the `web-vitals` library or the **Web Vitals** Chrome extension.
 
 ---
 
-## Problemas e Soluções
+## Problems and Solutions
 
-### 1. Re-renders desnecessários → `React.memo`
+### 1. Unnecessary re-renders → `React.memo`
 
-**Problema:** Quando um componente pai re-renderiza, todos os filhos re-renderizam junto, mesmo que as props não mudaram.
+**Problem:** When a parent component re-renders, all children re-render too, even if their props didn't change.
 
 ```tsx
-// ANTES: TaskItem re-renderiza a cada mudança no pai
+// BEFORE: TaskItem re-renders on every parent change
 function TaskItem({ task }: Props) { ... }
 
-// DEPOIS: só re-renderiza se `task` mudar
+// AFTER: only re-renders if `task` changes
 const TaskItem = memo(function TaskItem({ task }: Props) { ... })
 ```
 
-**Observe no Profiler:** na versão Before, `TaskItem` aparece no flamegraph mesmo sem mudança nas tasks.
+**See in Profiler:** in the Before version, `TaskItem` appears in the flamegraph even when tasks haven't changed.
 
 ---
 
-### 2. Função recriada a cada render → `useCallback`
+### 2. Function recreated on every render → `useCallback`
 
-**Problema:** funções definidas dentro do componente são recriadas a cada render. Isso quebra `React.memo` nos filhos, pois a referência é sempre nova.
+**Problem:** functions defined inside a component are recreated on every render. This breaks `React.memo` on children, since the reference is always new.
 
 ```tsx
-// ANTES: nova função a cada render → memo não funciona
+// BEFORE: new function on every render → memo doesn't work
 <SearchBar onSearch={(value) => setSearch(value)} />
 
-// DEPOIS: referência estável
+// AFTER: stable reference
 const handleSearch = useCallback((value: string) => setSearch(value), [setSearch])
 <SearchBar onSearch={handleSearch} />
 ```
 
-**Quando usar:** só vale a pena quando a função é passada como prop para um componente memoizado com `React.memo`.
+**When to use:** only worth it when the function is passed as a prop to a component wrapped in `React.memo`.
 
 ---
 
-### 3. Cálculo pesado a cada render → `useMemo`
+### 3. Heavy calculation on every render → `useMemo`
 
-**Problema:** cálculos custosos (agregações, filtros, transformações) rodam a cada render mesmo que os dados de entrada não mudaram.
+**Problem:** expensive computations (aggregations, filters, transformations) run on every render even when their inputs haven't changed.
 
 ```tsx
-// ANTES: roda a cada render do Dashboard
+// BEFORE: runs on every Dashboard render
 const computed = expensiveStatsCalc(stats)
 
-// DEPOIS: só roda quando `stats` mudar
+// AFTER: only runs when `stats` changes
 const computed = useMemo(() => expensiveStatsCalc(stats), [stats])
 ```
 
-**Onde está no código:** `src/components/Stats/Stats.tsx` — `expensiveStatsCalc` bloqueia a thread por ~8ms intencionalmente para tornar o custo visível no Profiler.
+**Where it is in the code:** `src/components/Stats/Stats.tsx` — `expensiveStatsCalc` intentionally blocks the thread for ~8ms to make the cost visible in the Profiler.
 
 ---
 
-### 4. Lista longa no DOM → Virtualização (`react-window`)
+### 4. Long list in the DOM → Virtualization (`react-window`)
 
-**Problema:** renderizar 10.000 itens no DOM cria 10.000 nós, consome memória e trava o scroll.
+**Problem:** rendering 10,000 items creates 10,000 DOM nodes, consuming memory and freezing scroll.
 
 ```tsx
-// ANTES: todos os 10.000 itens no DOM
+// BEFORE: all 10,000 items in the DOM
 {tasks.map((task) => <TaskItem key={task.id} task={task} />)}
 
-// DEPOIS: react-window renderiza apenas ~10 itens visíveis
+// AFTER: react-window renders only ~10 visible items
 <FixedSizeList
   height={500}
   itemCount={tasks.length}
@@ -129,24 +129,24 @@ const computed = useMemo(() => expensiveStatsCalc(stats), [stats])
 </FixedSizeList>
 ```
 
-**Observe:** no DevTools → Elements, compare quantos nós `.item` existem no Before vs After.
+**See:** in DevTools → Elements, compare how many `.item` nodes exist in Before vs After.
 
 ---
 
-### 5. Bundle grande → `React.lazy + Suspense`
+### 5. Large bundle → `React.lazy + Suspense`
 
-**Problema:** todo o código JS é carregado de uma vez, mesmo partes que o usuário pode nunca ver.
+**Problem:** all JS code is loaded at once, even parts the user may never visit.
 
 ```tsx
-// ANTES: importação estática — sempre no bundle inicial
+// BEFORE: static import — always in the initial bundle
 import { HeavyComponent } from './HeavyComponent'
 
-// DEPOIS: carregado só quando necessário
+// AFTER: loaded only when needed
 const HeavyComponent = lazy(() => import('./HeavyComponent'))
 
 function App() {
   return (
-    <Suspense fallback={<div>Carregando...</div>}>
+    <Suspense fallback={<div>Loading...</div>}>
       <HeavyComponent />
     </Suspense>
   )
@@ -155,37 +155,37 @@ function App() {
 
 ---
 
-## Estrutura do Projeto
+## Project structure
 
 ```
 src/
-├── data/tasks.ts                    # Gerador de 10.000 tarefas mockadas
-├── hooks/useTasks.ts                # Lógica de filtro e busca
+├── data/tasks.ts                    # Generator for 10,000 mock tasks
+├── hooks/useTasks.ts                # Filter and search logic
 ├── components/
 │   ├── Dashboard/
-│   │   ├── Dashboard.tsx            # Versão com problemas (Before)
-│   │   └── DashboardOptimized.tsx   # Versão otimizada (After)
+│   │   ├── Dashboard.tsx            # Version with problems (Before)
+│   │   └── DashboardOptimized.tsx   # Optimized version (After)
 │   ├── TaskList/
-│   │   ├── TaskList.tsx             # Lista sem virtualização
-│   │   ├── TaskListOptimized.tsx    # Lista com react-window
-│   │   └── TaskItem.tsx             # Item (+ versão memoizada)
-│   ├── SearchBar/SearchBar.tsx      # Campo de busca e filtros
-│   └── Stats/Stats.tsx              # Cards de estatísticas + cálculo pesado
+│   │   ├── TaskList.tsx             # List without virtualization
+│   │   ├── TaskListOptimized.tsx    # List with react-window
+│   │   └── TaskItem.tsx             # Item (+ memoized version)
+│   ├── SearchBar/SearchBar.tsx      # Search input and filters
+│   └── Stats/Stats.tsx              # Stats cards + expensive calculation
 ├── pages/
 │   ├── BeforePage.tsx
 │   └── AfterPage.tsx
-├── wdyr.ts                          # Configuração do why-did-you-render
+├── wdyr.ts                          # why-did-you-render setup
 └── main.tsx
 ```
 
-## Regras de ouro
+## Golden rules
 
-| Situação | Ferramenta |
+| Situation | Tool |
 |---|---|
-| Componente filho com props que não mudam sempre | `React.memo` |
-| Função passada como prop para componente memoizado | `useCallback` |
-| Cálculo custoso com dependências específicas | `useMemo` |
-| Lista com centenas/milhares de itens | `react-window` ou `react-virtual` |
-| Rota ou componente raramente acessado | `React.lazy + Suspense` |
+| Child component with props that rarely change | `React.memo` |
+| Function passed as prop to a memoized component | `useCallback` |
+| Expensive calculation with specific dependencies | `useMemo` |
+| List with hundreds/thousands of items | `react-window` or `react-virtual` |
+| Route or component that is rarely accessed | `React.lazy + Suspense` |
 
-> **Atenção:** não otimize prematuramente. Meça primeiro com o Profiler, depois aplique a solução.
+> **Warning:** don't optimize prematurely. Measure first with the Profiler, then apply the solution.
