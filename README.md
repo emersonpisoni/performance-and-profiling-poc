@@ -189,3 +189,48 @@ src/
 | Route or component that is rarely accessed | `React.lazy + Suspense` |
 
 > **Warning:** don't optimize prematurely. Measure first with the Profiler, then apply the solution.
+
+---
+
+## Advanced topics for future study
+
+### Rendering
+- **React Compiler** (formerly React Forget) — automatic memoization without writing `useMemo`/`useCallback` by hand. Currently in beta for React 19.
+- **`useTransition`** — marks state updates as non-urgent, preventing heavy renders from blocking the UI. Directly applicable to the 10,000-task filter in this project.
+- **`useDeferredValue`** — similar to `useTransition` but for values received via props. Renders the "old" version while processing the new one.
+- **Suspense for data fetching** — declaratively coordinates loading states, avoiding request waterfalls.
+
+### Lists and DOM
+- **TanStack Virtual (`react-virtual`)** — modern alternative to `react-window`, with support for variable-height items and more flexibility.
+- **Infinite scroll vs. pagination** — tradeoffs between both models for large lists.
+- **`content-visibility: auto`** — pure CSS that virtualizes visual rendering without JS. A good alternative for moderate-sized lists.
+
+### Bundle and loading
+- **Code splitting by route** — `React.lazy` combined with a router (React Router, TanStack Router) to load only the current route's code.
+- **Tree shaking** — understanding how the bundler removes unused code and how to structure exports to avoid breaking the process.
+- **Bundle analysis** — tools like `rollup-plugin-visualizer` or `webpack-bundle-analyzer` to see what is weighing down the build.
+- **Prefetch and preload** — browser hints to load resources before the user needs them.
+
+### Measurement
+- **Lighthouse CI** — run performance audits automatically on each PR to prevent regressions.
+- **Web Vitals in the field (RUM)** — collect real user metrics in production with `web-vitals` + an analytics service.
+- **React `<Profiler>` API** — component you can place in code to measure renders programmatically, not just via DevTools.
+- **Browser Performance API** — `performance.mark` and `performance.measure` to instrument specific code sections.
+
+### State and data
+- **State normalization** — structuring data in a flat format (like a relational database) to avoid cascading re-renders when one item changes.
+- **Selectors with Recoil / Zustand / Jotai** — how atomic stores avoid the global re-renders that the Context API causes.
+- **Server Components (RSC)** — move components to the server, eliminating rendering cost and JS bundle on the client.
+- **Streaming SSR** — send HTML in chunks as it becomes ready, improving LCP without waiting for the server to process everything.
+
+### Suggested study order
+
+```
+useTransition / useDeferredValue  →  React Compiler
+        ↓
+  TanStack Virtual  →  bundle analysis
+        ↓
+  Web Vitals in production  →  Server Components
+```
+
+Start with `useTransition` — it has immediate impact and fits directly into the filter problem already present in this project.
